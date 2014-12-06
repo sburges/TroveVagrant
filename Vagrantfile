@@ -59,7 +59,7 @@ Vagrant.configure("2") do |config|
    config.vm.provider :vmware_fusion do |vmf, override|
     vmf.gui = "TRUE"
     vmf.vmx["memsize"] = ram
-    vmf.vmx["numvcpus"] = cpus
+    vmf.vmx["numvcpus"] = cpu
   end
 
   # Libvirt specific settings
