@@ -12,11 +12,11 @@ Vagrant.configure("2") do |config|
   # please see the online documentation at vagrantup.com.
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "trusty-server-cloudimg-amd64"
+  config.vm.box = "trusty-server-amd64"
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
-  config.vm.box_url = "http://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-amd64-vagrant-disk1.box"
+  config.vm.box_url = "https://oss-binaries.phusionpassenger.com/vagrant/boxes/latest/ubuntu-14.04-amd64-vmwarefusion.box"
 
   # Assign this VM to a host-only network IP, allowing you to access it
   # via the IP. Host-only networks can talk to the host machine as well as
@@ -45,7 +45,7 @@ Vagrant.configure("2") do |config|
   #config.vm.synced_folder "/Users/shayneburgess/Library/Caches/pypi", "/tmp/pypi_cache", create: true
   #config.vm.synced_folder "/Users/shayneburgess/workspace/devstack", "/tmp/devstack", create: true, type: "rsync"
   config.vm.synced_folder "/Users/shayneburgess/gitrepos/trove", "/opt/stack/trove", create: true, type: "rsync"
-  config.vm.synced_folder "/Users/shayneburgess/gitrepos/trove-integration", "/Users/ubuntu/trove-integration", create: true, type: "rsync"
+  config.vm.synced_folder "/Users/shayneburgess/gitrepos/trove-integration", "/home/ubuntu/trove-integration", create: true, type: "rsync"
 
   # VirtualBox specific settings.
   config.vm.provider :virtualbox do |vb|
@@ -62,14 +62,7 @@ Vagrant.configure("2") do |config|
     vmf.vmx["numvcpus"] = cpu
   end
 
-  # Libvirt specific settings
-  config.vm.provider :libvirt do |domain|
-    domain.memory = ram
-    domain.nested = false
-    domain.storage :file, :size => '10G', :device => 'vda'
-  end
-
   # Run the provisioning script
-  config.vm.provision "shell", path: "provision-root.sh"
+  config.vm.provision "shell", path: "provision-root.sh", args: [ENV.fetch('HOST_IP', '0.0.0.0'), ENV.fetch('ENABLE_CACHE','false')]
 
 end

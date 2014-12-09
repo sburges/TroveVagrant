@@ -3,7 +3,9 @@
 set -ex
 
 # Copy the git submodule checkout over into home
-cp -r /vagrant/trove-integration ~
+#cp -r /vagrant/trove-integration ~
+sudo chown -R ubuntu:ubuntu /home/ubuntu
+sudo chown -R ubuntu:ubuntu /opt/stack
 
 cd ~/trove-integration/scripts
 # Disable Swift

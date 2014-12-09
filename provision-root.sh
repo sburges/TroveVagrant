@@ -2,20 +2,21 @@
 
 set -ex
 
+
 PROVFILE=/home/vagrant/.vagrant_provisioned
 if [ -e $PROVFILE ]; then
   echo "Already provisioned. To re-provision remove $PROVFILE and then do \"vagrant reload\"."
   exit 0
 fi
 
-if [ -e /dev/disk/by-label/opt ]; then
-    echo "Not creating separate filesystem for /opt (already exists)"
-else
-    # Create a separate filesystem for /opt
-    mkfs -t ext4 -L opt /dev/vda
-    echo -e "LABEL=opt\t/opt\tauto\trelatime\t0\t0" >> /etc/fstab
-fi
-mount -a
+#if [ -e /dev/disk/by-label/opt ]; then
+#    echo "Not creating separate filesystem for /opt (already exists)"
+#else
+#    # Create a separate filesystem for /opt
+#    mkfs -t ext4 -L opt /dev/vda
+#    echo -e "LABEL=opt\t/opt\tauto\trelatime\t0\t0" >> /etc/fstab
+#fi
+#mount -a
 
 apt-get update
 
@@ -26,6 +27,7 @@ apt-get -y install squid3
 sed -e 's/^#cache_dir/cache_dir/' -i /etc/squid3/squid.conf
 service squid3 restart
 
+if ! grep $http_proxy /etc/environment && ${enable_cache}; then
 # Use the proxy server settings in the environment
 export http_proxy="http://$host_ip:8080"
 export https_proxy="http://$host_ip:8080"
@@ -42,7 +44,7 @@ EOF
 fi
 
 # Also use the local proxy server for APT
-if ! grep $http_proxy /etc/apt/apt.conf.d/50proxy; then
+if ! grep $http_proxy /etc/apt/apt.conf.d/50proxy && ${enable_cache}; then
   tee -a /etc/apt/apt.conf.d/50proxy <<EOF
 Acquire::http::Proxy "$http_proxy";
 EOF
@@ -70,7 +72,7 @@ sudo ls -l /etc/sudoers.d/60-ubuntu
 
 # Hand off to the second part of the provisioning script,
 # which must run as a regular user.
-sudo -i -u vagrant /vagrant/provision-vagrant.sh
+sudo -i -u ubuntu /vagrant/provision-vagrant.sh
 
 # Prevent accidental re-provisioning
 touch $PROVFILE
